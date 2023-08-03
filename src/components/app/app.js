@@ -17,7 +17,8 @@ class App extends Component {
         {name:'Andryi',salary:900,increase:false,star:false,id:2},
         {name:'Vasyl',salary:400,increase:true,star:false,id:3},
       ],
-      trigger:1
+      trigger:1,
+      searchStr:''
     }
     this.maxId=4
     this.trigger=false
@@ -27,9 +28,8 @@ class App extends Component {
     this.setState(({trigger})=>({
       trigger:2
     }))
- 
- 
   }
+
   showAll=()=>{
     this.setState(({trigger})=>({
       trigger:1
@@ -40,6 +40,7 @@ class App extends Component {
       trigger:3
     }))
   }
+
   toggleStar=(id)=>{
     this.setState(({data})=>({
       data:data.map(item=>{
@@ -50,22 +51,28 @@ class App extends Component {
       })
     }))
   }
-  
-  find = (str) => {
 
+  changeSearchStr=(str)=>{
 
-    let arr= this.state.data.filter(item => item.name ===str)
-    console.log(arr)
+    this.setState(()=>({
+      searchStr: str
+    }))
+    console.log(this.state.searchStr)
+  }
 
-    if(arr.length>0){
-      this.setState(({ data }) => ({
-        data:arr
-      }));
+  find = (data,str) => {
+    console.log('yes')
+    if(str.length===0){
+      console.log(0)
+      return data
     }else{
-      this.setState(({ data }) => ({
-        data:this.old
-      }));
+
+      console.log(data.filter(item=> item.name.indexOf(str)>-1))
+      return data.filter(item=>{
+        return item.name.indexOf(str)>-1
+      })
     }
+
 
   }
   
@@ -99,21 +106,23 @@ class App extends Component {
   render(){
     let data
     switch(this.state.trigger){
-      case 1 :data=this.state.data;
+      case 1 :data=this.find(this.state.data,this.state.searchStr)
       break
-      case 2 :data=this.state.data.filter(item=>item.increase);
+      case 2 :data=this.find(this.state.data.filter(item=>item.increase),this.state.searchStr) 
       break
-      case 3 :data=this.state.data.filter(item=>item.salary>1000);
+      case 3 :data=this.find(this.state.data.filter(item=>item.salary>1000),this.state.searchStr) 
       break
       default: data=this.state.data
     }
+    console.log( data)
     return (
       <div className="app">
         <AppInfo  
         data={this.state.data}/>
         <div className="search-panel">
 
-          <SearchPanel find={this.find}/>
+          <SearchPanel 
+          changeSearchStr={this.changeSearchStr}/>
 
           <AppFilter 
           showAll={this.showAll}
